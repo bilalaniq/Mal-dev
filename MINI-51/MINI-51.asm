@@ -8,7 +8,7 @@ ORG 100h
 section .text
 
 START:
-     MOV DX, OFFSET FILESPEC ;handle to search criteria 
+     MOV DX, FILESPEC ;handle to search criteria 
                            ;away from beg. of file
      MOV AH, 4Eh           ;setup for Dos function-find file
      INT 21h               ;search for first file match

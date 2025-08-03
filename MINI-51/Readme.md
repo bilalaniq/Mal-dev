@@ -38,9 +38,9 @@ The **MINI-51** virus is a small, real-mode DOS file infector that targets `.COM
 
 ## 📁 File Info
 
-| File         | Description             |
-|--------------|--------------------------|
-| `MINI-51.asm` | Assembly source code     |
+| File          | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `MINI-51.asm` | Assembly source code                                  |
 | `MINI-51.com` | Compiled infected payload (optional, not distributed) |
 
 ---
@@ -166,3 +166,87 @@ db 00
 * It's an excellent example of **retro malware** suitable for study in **cybersecurity education** or **reverse engineering labs**.
 
 ---
+
+## Proof that it work 
+
+first use edit commamnd to write the code in the freedos. you canot copy code hrom host to freedos it does not support this 
+
+but you can use the `VBoxManage` tool like 
+
+```bash
+VBoxManage controlvm freedos keyboardputstring "Hello"
+```
+
+![code](./img/code.jpg)
+
+i have written the code here 
+
+now lets compile it using `nasm` if nasm is not installed use this command to download 
+
+```bash
+fdnpkg install nasm
+```
+
+to compile use this command 
+
+```bash
+nasm virus.asm -f bin -o virus.com
+```
+
+bin tells NASM to produce a flat binary output:
+
+- No headers
+- No sections
+- Just raw bytes
+
+![nasm](./img/nasm.png)
+
+now lets also create host files which virus will attack on
+
+```nasm
+org 100h
+
+    mov ah, 9
+    mov dx, message
+    int 21h
+
+    mov ax, 0x4C00
+    int 21h
+
+message db 'You have just released a virus! Have a nice day!$'
+```
+
+use this command to compile 
+
+```bash
+nasm HOST.asm -f bin -o HOST.com
+```
+
+![host](./img/host.png)
+
+
+<br>
+
+![host compilation](./img/host_comp.png)
+
+here you can see that i have created two host com files 
+
+![they work](./img/works.png)
+
+<br> 
+
+no wlets execute the virus
+
+![final result](./img/final_result.png)
+
+now you can see that after executing the virus the host files are no longer working like they were before 
+
+so lets compare the two files using `comp` command in freedos
+
+![comp](./img/comp.png)
+
+boom! we have created our first virus 
+
+
+
+
