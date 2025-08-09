@@ -19,10 +19,10 @@ Do **not** test on production systems.
 
 ## 📂 Malware Index
 
-| #   | Name                  | Description              | Status |
-| --- | --------------------- | ------------------------ | ------ |
-| 1   | [MINI-51](./MINI-51/) | COM infector virus (DOS) | ✅ Done |
-
+| #   | Name                                                                  | Description                | Status |
+| --- | --------------------------------------------------------------------- | -------------------------- | ------ |
+| 1   | [MINI-51](./MINI-51/)                                                 | COM infector virus (DOS)   | ✅ Done |
+| 2   | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector virus (32-bit) | ✅ Done |
 
 ## 📜 License
 
