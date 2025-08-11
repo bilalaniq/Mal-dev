@@ -1,30 +1,49 @@
+
+<div align="center">
+  
 # MAL-DEV
 
-This repository is dedicated to malware development (MalDev) research and experimentation **for educational purposes only**.
+<img src="./img/gameover.jpg" width="400" alt="Game Over">
 
-## ⚠️ Disclaimer
+> *Malware Development Research Repository*
 
-This project is intended solely for:
+</div>
 
-- Understanding malware behavior  
-- Learning low-level systems programming  
-- Practicing malware analysis and reverse engineering  
+##  About
+This repository is dedicated to **malware development (MalDev)** research and experimentation for **educational purposes only**.  
+A collection of proof-of-concepts to understand offensive security techniques.
 
-**Any misuse of the contents is strictly discouraged. Use responsibly and ethically.**
+<div align="center">
 
-## 💻 Usage
+⚠️ **Use Responsibly** ⚠️  
+*All content is provided for research and academic purposes only*
 
-Run and analyze all binaries in a **safe, isolated lab environment** such as VirtualBox with FreeDOS or DOSBox.  
-Do **not** test on production systems.
+</div>
 
-## 📂 Malware Index
+## Features
+- Classic malware specimens
+- Educational resources
+- Analysis-friendly code
+- Defensive techniques
 
-| #   | Name                                                                  | Description                | Status |
-| --- | --------------------------------------------------------------------- | -------------------------- | ------ |
-| 1   | [MINI-51](./MINI-51/)                                                 | COM infector virus (DOS)   | ✅ Done |
-| 2   | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector virus (32-bit) | ✅ Done |
+
+
+
+
+## Malware Index
+| #   | Name | Description | Status | Danger Level |
+|-----|------|-------------|--------|--------------|
+| 1 | [MINI-51](./MINI-51/) | COM infector (DOS) | ✅ Done | ⚠️ Medium |
+| 2 | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector (32-bit) | ✅ Done | ⚠️ Medium |
 
 ## 📜 License
+This repository is provided **as-is** without warranty.  
+By using this content, you agree that:
+- You're using it for legitimate research/education
+- The author is **not** responsible for any misuse
+- You won't use it for illegal activities
 
-This repository is provided **as-is** without any warranty.  
-The author is not responsible for any damage caused by the use or misuse of this code.
+<div align="center">
+
+**Knowledge is Power - Use it Wisely** 🛡️
+
