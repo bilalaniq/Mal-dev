@@ -161,6 +161,8 @@ int main()
         DispatchMessage(&msg);
     }
 
+    //That loop is the engine that pumps events from Windows → into your WindowProc.
+
     return 0;
 }
 
