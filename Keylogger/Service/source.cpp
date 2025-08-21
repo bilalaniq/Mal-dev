@@ -121,6 +121,7 @@ bool StartServiceByName()
 
 int main(int argc, char* argv[])
 {
+    
     if (argc > 1) 
     {
         // Handle installer/uninstaller logic if user runs "MyService.exe install"
