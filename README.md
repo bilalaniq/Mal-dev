@@ -35,6 +35,9 @@ A collection of proof-of-concepts to understand offensive security techniques.
 | 1   | [MINI-51](./MINI-51/)                                                 | COM infector (DOS)                                       | Virus    |
 | 2   | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector (32-bit)                                     | Virus    |
 | 3   | [Reverse shells](./Reverse_shells/)                                   | Guide on how to create a reverse shell (Windows & Linux) | Tutorial |
+| 4   | [Keylogger](./Keylogger/)                                             | Demonstration of a keylogger for learning purposes       | Tutorial |
+
+
 
 
 
