@@ -30,11 +30,13 @@ A collection of proof-of-concepts to understand offensive security techniques.
 
 
 
-## Malware Index
-| #   | Name                                                                  | Description          | Type  |
-| --- | --------------------------------------------------------------------- | -------------------- | ----- |
-| 1   | [MINI-51](./MINI-51/)                                                 | COM infector (DOS)   | Virus |
-| 2   | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector (32-bit) | Virus |
+| #   | Name                                                                  | Description                                              | Type     |
+| --- | --------------------------------------------------------------------- | -------------------------------------------------------- | -------- |
+| 1   | [MINI-51](./MINI-51/)                                                 | COM infector (DOS)                                       | Virus    |
+| 2   | [Mini51-Style-Self-Copy-Infector](./Mini51-Style-Self-Copy-Infector/) | PE infector (32-bit)                                     | Virus    |
+| 3   | [Reverse shells](./Reverse_shells/)                                   | Guide on how to create a reverse shell (Windows & Linux) | Tutorial |
+
+
 
 
 
