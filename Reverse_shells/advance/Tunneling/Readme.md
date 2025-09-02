@@ -251,7 +251,7 @@ execve("/bin/sh", NULL, NULL);
 ![nc](./img/nc.png)
 
 
-boom now we can now we donot have to wory about firewalls & NAT 
+boom now we donot have to wory about firewalls & NAT 
 
 
 A common issue with the free version of ngrok: the public hostname and port change every time you restart the tunnel. So your reverse shell code will break if it relies on a hardcoded hostname or port.
