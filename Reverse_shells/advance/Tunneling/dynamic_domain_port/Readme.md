@@ -1,7 +1,3 @@
-Here’s a **polished, professional, and well-structured version** of your README/tutorial, keeping the humor, flow, and technical details intact:
-
----
-
 # Dynamic Reverse Shell Tunnel with Vercel & ngrok
 
 A common limitation of the **free version of ngrok** is that the public hostname and port change every time you restart the tunnel. This means any reverse shell code relying on a **hardcoded hostname or port** will break whenever the tunnel restarts.
